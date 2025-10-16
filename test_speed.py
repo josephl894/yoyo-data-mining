@@ -11,7 +11,7 @@ print("Sending request...")
 
 start = time.time()
 response = client.chat.completions.create(
-    model="qwen2.5-14b-instruct",
+    model="qwen3-4b",
     messages=[
         {"role": "system", "content": "You are a helpful assistant. Output JSON only."},
         {"role": "user", "content": test_prompt}
@@ -24,21 +24,25 @@ end = time.time()
 elapsed = end - start
 content = response.choices[0].message.content
 
-# Estimate tokens (rough: ~0.75 tokens per word)
-tokens = len(content.split()) * 0.75
-tokens_per_sec = tokens / elapsed if elapsed > 0 else 0
+# Get actual token counts from response
+completion_tokens = response.usage.completion_tokens
+total_tokens = response.usage.total_tokens
+tokens_per_sec = completion_tokens / elapsed if elapsed > 0 else 0
 
 print(f"\n{'='*60}")
 print(f"Total time: {elapsed:.2f}s")
-print(f"Response length: ~{int(tokens)} tokens")
-print(f"Speed: ~{tokens_per_sec:.1f} tokens/sec")
+print(f"Completion tokens: {completion_tokens}")
+print(f"Total tokens: {total_tokens}")
+print(f"Speed: {tokens_per_sec:.1f} tokens/sec")
 print(f"{'='*60}")
 print(f"\nResponse:\n{content[:200]}...")
 
-if tokens_per_sec < 30:
-    print("\n⚠️  SLOW! Expected 40-60 t/s on RTX 4070 Super")
+if tokens_per_sec < 20:
+    print("\n⚠️  VERY SLOW! GPU likely not being used")
     print("   Check: GPU layers, context length settings")
-elif tokens_per_sec > 40:
+elif tokens_per_sec < 50:
+    print("\n⚡ Acceptable speed (partial GPU offload)")
+elif tokens_per_sec < 100:
     print("\n✅ Good speed!")
 else:
-    print("\n⚡ Acceptable speed")
+    print("\n🚀 Excellent speed!")

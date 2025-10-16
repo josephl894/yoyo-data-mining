@@ -21,7 +21,7 @@ def main():
     print("=" * 80)
 
     # Configuration
-    NUM_MARKETS = 100  # Number of raw markets to scrape initially (before filtering)
+    NUM_MARKETS = 10000  # Number of raw markets to scrape initially (before filtering)
     MIN_DAYS_FUTURE = 30  # Markets must expire ≥30 days from now
     RAW_DATA_PATH = f'data/raw/scraped_markets_{NUM_MARKETS}.json'
     FILTERED_DATA_PATH = f'data/raw/filtered_markets_{NUM_MARKETS}.json'

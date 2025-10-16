@@ -6,12 +6,14 @@ help:
 	@echo "================================"
 	@echo ""
 	@echo "Available targets:"
-	@echo "  make run         - Clean cache and run full pipeline"
-	@echo "  make clean       - Remove cached filter/processed files"
-	@echo "  make clean-all   - Remove ALL cached files (including scraped)"
-	@echo "  make test        - Run with 100 markets (quick test)"
-	@echo "  make install     - Install Python dependencies"
-	@echo "  make help        - Show this help message"
+	@echo "  make run              - Clean cache and run pipeline (default: 1000 markets)"
+	@echo "  make run SCRAPE=10000 - Run pipeline with custom number of markets"
+	@echo "  make run-fresh        - Clean all cache and run fresh pipeline"
+	@echo "  make clean            - Remove cached filter/processed files"
+	@echo "  make clean-all        - Remove ALL cached files (including scraped)"
+	@echo "  make test             - Run with 100 markets (quick test)"
+	@echo "  make install          - Install Python dependencies"
+	@echo "  make help             - Show this help message"
 
 # Clean cached filter and processed files (keeps raw scraped data)
 clean:
@@ -37,13 +39,23 @@ install:
 	@echo "✓ Dependencies installed!"
 
 # Run pipeline (clean first)
+# Usage: make run SCRAPE=10000 (default: 1000)
 run: clean
 	@echo "Starting pipeline..."
+	@if [ -n "$(SCRAPE)" ]; then \
+		sed -i "s/NUM_MARKETS = [0-9]*/NUM_MARKETS = $(SCRAPE)/" main.py; \
+		echo "Set NUM_MARKETS to $(SCRAPE)"; \
+	fi
 	@python3 main.py
 
 # Run full clean + pipeline
+# Usage: make run-fresh SCRAPE=10000 (default: 1000)
 run-fresh: clean-all
 	@echo "Starting fresh pipeline (no cache)..."
+	@if [ -n "$(SCRAPE)" ]; then \
+		sed -i "s/NUM_MARKETS = [0-9]*/NUM_MARKETS = $(SCRAPE)/" main.py; \
+		echo "Set NUM_MARKETS to $(SCRAPE)"; \
+	fi
 	@python3 main.py
 
 # Quick test with 100 markets
